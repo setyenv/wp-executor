@@ -1,14 +1,14 @@
 # WP Executor
 
-> The remote agent for **ProjectFlash Workflow**. A small, single-binary worker written in Rust that runs the actions a WordPress site should not — system commands, filesystem operations, outbound HTTP — on a host you control.
+> **The open-source remote execution agent for the ProjectFlash workflow platform.** A single-binary worker, written in Rust, that performs the host-side operations a workflow requires — system commands, file IO, outbound HTTP — on infrastructure you control.
 
 [![ci](https://github.com/Project-Flash-Build/wp-executor/actions/workflows/ci.yml/badge.svg)](https://github.com/Project-Flash-Build/wp-executor/actions/workflows/ci.yml)
 [![release](https://img.shields.io/github/v/release/Project-Flash-Build/wp-executor?display_name=tag&sort=semver)](https://github.com/Project-Flash-Build/wp-executor/releases)
 [![license](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue.svg)](#license)
 
-`wp-executor` is the open-source companion of two commercial WordPress plugins built by Project Flash. It does the things your WordPress install cannot do safely from inside a `php-fpm` request: shell commands, OS-level file IO, long network calls. The plugin tells the executor *what* to do; the executor decides *whether* to do it and reports back.
+`wp-executor` is the open-source companion of the ProjectFlash commercial workflow platform. The platform models the *intent* of an automation; this binary executes that intent's host-side actions — shell commands, file system operations, outbound network calls — on hardware you operate, under a capability allowlist you define.
 
-This repository contains the executor binary, install scripts for the three major desktop platforms, and the cross-platform CI that builds it.
+This repository contains the executor binary, install scripts for Linux, macOS and Windows, and the cross-platform CI that builds it.
 
 ---
 
@@ -17,8 +17,8 @@ This repository contains the executor binary, install scripts for the three majo
 ```
                                        results + logs
         ┌─────────────────────────────┐  ◀───────────  ┌───────────────────┐
-        │   wp-pfworkflow (WP plugin) │                │   wp-executor     │
-        │   visual workflow builder   │  ──────────▶   │   (this binary)   │
+        │   WP-PFWorkflow platform    │                │   wp-executor     │
+        │   (commercial WP product)   │  ──────────▶   │   (this binary)   │
         └─────────────────────────────┘  job intent    └────────┬──────────┘
                        ▲                                        │
                        │ user-facing automations                │ runs in your
@@ -29,23 +29,23 @@ This repository contains the executor binary, install scripts for the three majo
                 └─────────────┘                          └─────────────────┘
 ```
 
-The plugin is the canvas where customers draw automations. When an action requires a host operation that is unsafe inside WordPress (think `git pull`, `ffmpeg` encode, scheduled backup), the plugin records the intent. `wp-executor` periodically picks up that intent, runs it on its own machine, and ships the structured result back. Authentication is bearer-token plus optional HMAC body signing.
+The platform is where customers compose automations. When a step requires an action that should not run inside the WordPress request lifecycle — repository synchronisation, media transcoding, scheduled backups, or any operation that benefits from a separate execution boundary — the platform records the intent. `wp-executor` polls for that intent on its own cadence, evaluates it against a local capability allowlist, executes it, and returns a structured result. Authentication is bearer-token, optionally augmented with HMAC body signing.
 
-The transport details and queue semantics are intentionally not documented here — they live in the plugin's own contract, served at runtime over a versioned REST endpoint that the executor consumes on startup.
+The wire protocol and queue semantics are not enumerated here: the platform publishes its versioned contract over a public REST surface, and the executor consumes it on startup as the source of truth.
 
 ### What it shows
 
-| <img src="assets/wp-pfworkflow-dashboard.png" alt="ProjectFlash Workflow dashboard" /> | <img src="assets/wp-pfworkflow-editor.png" alt="ProjectFlash Workflow editor" /> |
+| <img src="assets/wp-pfworkflow-dashboard.png" alt="WP-PFWorkflow workflow library" /> | <img src="assets/wp-pfworkflow-editor.png" alt="WP-PFWorkflow workflow editor" /> |
 |:---:|:---:|
-| `wp-pfworkflow` workflow library — visual catalog of every automation a site has, with state badges and node counts. | The visual editor where workflows are designed. Triggers, conditions, function calls, error boundaries, all visible. |
+| **The workflow library.** A unified inventory of every automation defined for a site, with execution state and structural metrics surfaced at a glance. | **The visual workflow editor.** Triggers, conditional branches, function invocations and error boundaries are first-class graph elements. The canvas is the production surface, not a sketch. |
 
-The screenshots above are taken from the upstream plugin (commercial, not open source — see [Related products](#related-products)). They're included here so the role of the executor is obvious: a workflow in the editor pushes a job; the executor runs it.
+The screenshots are taken from WP-PFWorkflow, the upstream commercial product — see [Related products](#related-products). They are included here so the role of the executor is unambiguous: the platform composes and dispatches a workflow; the executor performs the host-side work that workflow requires.
 
 ---
 
 ## Capabilities
 
-The executor implements exactly the six capabilities the upstream plugin defines, no more, no less. Each one has a typed payload and a typed result. The plugin describes them in full at runtime; the summary below is operator-facing.
+The executor implements exactly the six capabilities the platform's contract defines, no more, no less. Each one carries a typed payload and returns a typed result.
 
 | Key | What it does | Typical use |
 |---|---|---|
@@ -53,7 +53,7 @@ The executor implements exactly the six capabilities the upstream plugin defines
 | `fs.read` | Read a file as utf-8 or base64, with a max-bytes guard and best-effort MIME detection | Hand a config file, a log fragment or a generated artifact back to the workflow |
 | `fs.write` | Write a file (overwrite / append / create-only), auto-create parent directories, base64 input ok | Drop a generated report, save a downloaded asset, stage a file before another step picks it up |
 | `fs.list` | Directory listing, optional recursive, hidden filter, max-entries cap | Inventory a release directory, drive a per-file loop in the workflow |
-| `http.request` | Arbitrary HTTP call (any method, any headers, JSON or string body) with timeout. Status code is surfaced as the exit code | Hit a LAN-only API, call a self-hosted service, fetch from a private host the WP server cannot reach |
+| `http.request` | Arbitrary HTTP call (any method, any headers, JSON or string body) with timeout. Status code is surfaced as the exit code | Hit a LAN-only API, call a self-hosted service, fetch from a private host the WordPress server cannot reach |
 | `system.info` | OS, arch, hostname, CPU count, memory, executor version, uptime, capabilities advertised | Health checks, populating workflow metadata, fleet inventory |
 
 Every capability accepts an executor-side timeout, refuses to perform operations outside the configured allowlist, and returns a uniform `{ exit_code, stdout, stderr, output, duration_ms, error }` payload.
@@ -73,7 +73,7 @@ cargo build --release
 # binary at target/release/wp-executor
 ```
 
-Requires Rust 1.80 or newer. No system dependencies (TLS uses rustls).
+Requires Rust 1.80 or newer. No system dependencies (TLS uses `rustls`).
 
 ### Run as a service
 
@@ -110,7 +110,7 @@ bearer_token = "pfw_worker_<id>_<secret>"
 
 The full set of tunables (poll interval, lease duration, allowlist, signing toggle, etc.) is documented in [`scripts/config.example.toml`](scripts/config.example.toml).
 
-The bearer token is issued by the upstream plugin admin when a worker is registered. It is shown in plain text exactly once; rotate via the plugin's admin UI when needed. The executor never prints the secret in log lines.
+The bearer token is provisioned for each worker through the WP-PFWorkflow administration surface; it is shown in plain text exactly once and can be rotated at any time. The executor never writes the secret to disk beyond the config file and never emits it in log output.
 
 ---
 
@@ -144,23 +144,23 @@ A successful probe prints the upstream contract document and exits zero.
 - Capabilities run with the privileges of the user the executor process runs as. Install as a dedicated low-privilege user where possible (the Linux installer does this by default).
 - The executor never writes secrets to disk beyond the config file, and redacts the bearer token in `show-config` output.
 - TLS is provided by `rustls`; OpenSSL is not a dependency. Rotating the system trust store is sufficient to update the executor's trust anchors.
-- Capability allowlist (`allowed_capabilities` in config) is enforced *before* execution. The upstream also enforces a per-worker allowlist server-side; both must agree for a job to run.
+- Capability allowlist (`allowed_capabilities` in config) is enforced *before* execution. The platform also enforces a per-worker allowlist server-side; both must agree for a job to run.
 
 ---
 
 ## Related products
 
-`wp-executor` is the open-source piece of a three-product ProjectFlash family:
+`wp-executor` is the open-source surface of a three-product portfolio from Project Flash Build:
 
 | Component | Status |
 |---|---|
-| **wp-executor** (this repo) | Open source. Released today as v1.0.0. |
-| **WP-PFWorkflow** | Commercial WordPress plugin. The visual workflow studio shown in the screenshots above. **General availability: May 14, 2026.** |
-| **WP-PFAgent** | Commercial WordPress plugin. AI agent surface that drives the workflow studio from natural language. **General availability: May 14, 2026.** |
+| **wp-executor** (this repository) | **Open source.** Released under MIT OR Apache-2.0. |
+| **WP-PFWorkflow** | The commercial visual workflow platform shown in the screenshots above. WordPress plugin, source-available to licensees. **General availability: May 14, 2026.** |
+| **WP-PFAgent** | The commercial AI agent layer that drives the workflow platform from natural language. WordPress plugin, source-available to licensees. **General availability: May 14, 2026.** |
 
-WP-PFWorkflow and WP-PFAgent are **proprietary, source-available to licensees only**, and are not distributed under the same license as this repository. They will be available for purchase, evaluation download and licensing through the **Project Flash product portal launching at [project-flash.com](https://project-flash.com) on May 7, 2026**.
+WP-PFWorkflow and WP-PFAgent are **proprietary, source-available to licensees only**, and are distributed independently of this repository's permissive license. Both will be available for evaluation, purchase and licensing through the Project Flash product portal at [project-flash.com](https://project-flash.com), opening **May 7, 2026**.
 
-This executor is fully functional on its own against the public REST contract those plugins publish; you do not need a license to *use* the executor, only to use the plugins on the WordPress side.
+The executor is fully functional on its own against the platform's published REST contract; no commercial licence is required to operate `wp-executor` itself — only to license the platform on the WordPress side.
 
 ---
 
@@ -172,7 +172,7 @@ cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all-targets
 ```
 
-The unit and integration test suites run on every commit on Linux, macOS and Windows via GitHub Actions. The integration tests in `tests/worker_loop.rs` use [`wiremock`](https://crates.io/crates/wiremock) to stand in for the upstream REST API, so they do not require a running WordPress instance.
+The unit and integration suites run on every commit on Linux, macOS and Windows via GitHub Actions. Integration tests in `tests/worker_loop.rs` use [`wiremock`](https://crates.io/crates/wiremock) to stand in for the upstream REST surface, so they do not require a running WordPress instance.
 
 ---
 
@@ -185,7 +185,7 @@ Dual-licensed under either of:
 
 at your option. SPDX: `MIT OR Apache-2.0`.
 
-The screenshots in `assets/` belong to ProjectFlash and depict the commercial WP-PFWorkflow plugin; they are licensed for redistribution as part of this repository under the same dual license.
+The screenshots under `assets/` are © Project Flash Build and depict the commercial WP-PFWorkflow product. They are redistributed within this repository under the same dual licence as the source.
 
 ---
 
