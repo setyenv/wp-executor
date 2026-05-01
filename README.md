@@ -37,7 +37,7 @@ The transport details and queue semantics are intentionally not documented here 
 
 | <img src="assets/wp-pfworkflow-dashboard.png" alt="ProjectFlash Workflow dashboard" /> | <img src="assets/wp-pfworkflow-editor.png" alt="ProjectFlash Workflow editor" /> |
 |:---:|:---:|
-| `wp-pfworkflow` workflow library — visual catalog of every automation a site has, with state badges and node counts. | The Rete-based editor where workflows are designed. Triggers, conditions, function calls, error boundaries, all visible. |
+| `wp-pfworkflow` workflow library — visual catalog of every automation a site has, with state badges and node counts. | The visual editor where workflows are designed. Triggers, conditions, function calls, error boundaries, all visible. |
 
 The screenshots above are taken from the upstream plugin (commercial, not open source — see [Related products](#related-products)). They're included here so the role of the executor is obvious: a workflow in the editor pushes a job; the executor runs it.
 
