@@ -1,6 +1,6 @@
 [package]
 name = "wp-executor"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 rust-version = "1.80"
 authors = ["Project Flash Build <build@project-flash.com>"]
