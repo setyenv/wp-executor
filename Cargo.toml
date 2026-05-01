@@ -1,6 +1,51 @@
 [package]
 name = "wp-executor"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+rust-version = "1.80"
+authors = ["Project Flash Build <build@project-flash.com>"]
+description = "Remote command executor for the wp-pfworkflow plugin's remote queue. Pulls jobs over the documented REST contract, runs them locally, reports results back."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Project-Flash-Build/wp-executor"
+keywords = ["wordpress", "automation", "executor", "queue", "cli"]
+categories = ["command-line-utilities"]
+
+[[bin]]
+name = "wp-executor"
+path = "src/main.rs"
+
+[lib]
+name = "wp_executor"
+path = "src/lib.rs"
 
 [dependencies]
+tokio = { version = "1.40", features = ["rt-multi-thread", "macros", "process", "fs", "signal", "time", "io-util", "sync"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "gzip"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap = { version = "4", features = ["derive", "env"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+thiserror = "1"
+anyhow = "1"
+base64 = "0.22"
+hmac = "0.12"
+sha2 = "0.10"
+hex = "0.4"
+toml = "0.8"
+dirs = "5"
+sysinfo = { version = "0.32", default-features = false, features = ["system"] }
+hostname = "0.4"
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+mime_guess = "2"
+
+[dev-dependencies]
+wiremock = "0.6"
+tempfile = "3"
+tokio = { version = "1.40", features = ["test-util", "macros", "rt-multi-thread"] }
+
+[profile.release]
+strip = true
+opt-level = 3
+lto = "thin"
+codegen-units = 1

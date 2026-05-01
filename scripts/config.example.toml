@@ -1,0 +1,53 @@
+# wp-executor — example configuration file.
+#
+# Copy this file to the platform default location, then fill in
+# `base_url` and `bearer_token` before starting the executor.
+#
+# Default config locations (resolved by `dirs::config_dir()`):
+#   Linux   ~/.config/wp-executor/config.toml
+#   macOS   ~/Library/Application Support/wp-executor/config.toml
+#   Windows %APPDATA%\wp-executor\config.toml
+#
+# An explicit path can be provided via:
+#   wp-executor --config /path/to/config.toml run
+#   WP_EXECUTOR_CONFIG=/path/to/config.toml wp-executor run
+
+# REQUIRED: site root of the wp-pfworkflow install (no trailing /wp-json).
+base_url = "https://wp.example.com"
+
+# REQUIRED: bearer token issued by POST /remote/workers on the upstream.
+# Format: pfw_worker_<id>_<secret>. Shown ONCE at worker creation; rotate
+# via POST /remote/workers/<id>/rotate.
+bearer_token = "pfw_worker_1_REPLACE_WITH_REAL_SECRET"
+
+# REST namespace path (with version). Default matches the upstream
+# contract; bump only if the upstream releases a v2.
+namespace = "wp-pfworkflow/v1"
+
+# Maximum number of jobs to claim per poll. Server clamps to 25.
+max_jobs_per_claim = 5
+
+# Lease duration we ask for when claiming. Heartbeat extends this every
+# heartbeat_interval_seconds. Contract default is 60.
+lease_seconds = 60
+
+# How often we send a heartbeat while a job runs. Must be < lease_seconds.
+heartbeat_interval_seconds = 15
+
+# Sleep duration between poll cycles when the server returns no jobs.
+idle_poll_seconds = 5
+
+# Hard executor-side timeout per job. Capability payloads can override
+# (e.g. shell.run with timeout_seconds=600).
+default_job_timeout_seconds = 300
+
+# Send the X-PFW-Signature HMAC header on every outgoing request. Recommended.
+sign_requests = true
+
+# Optional capability allowlist. If unset (or commented out), ALL capabilities
+# this binary implements are allowed. The upstream also enforces a per-worker
+# capability set when claiming, so this is mostly a defence-in-depth toggle.
+# allowed_capabilities = ["shell.run", "fs.read", "fs.write", "fs.list", "http.request", "system.info"]
+
+# Optional User-Agent override. Default identifies the executor + version + OS.
+# user_agent = "my-host wp-executor/0.1"
