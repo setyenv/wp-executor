@@ -3,7 +3,7 @@
 > **The open-source remote execution agent for the ProjectFlash workflow platform.** A single-binary worker, written in Rust, that performs the host-side operations a workflow requires — system commands, file IO, outbound HTTP — on infrastructure you control.
 
 [![ci](https://github.com/Project-Flash-Build/wp-executor/actions/workflows/ci.yml/badge.svg)](https://github.com/Project-Flash-Build/wp-executor/actions/workflows/ci.yml)
-[![release](https://img.shields.io/github/v/release/Project-Flash-Build/wp-executor?display_name=tag&sort=semver)](https://github.com/Project-Flash-Build/wp-executor/releases)
+[![release](https://img.shields.io/github/v/tag/Project-Flash-Build/wp-executor?label=release&sort=semver)](https://github.com/Project-Flash-Build/wp-executor/releases)
 [![license](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue.svg)](#license)
 
 `wp-executor` is the open-source companion of the ProjectFlash commercial workflow platform. The platform models the *intent* of an automation; this binary executes that intent's host-side actions — shell commands, file system operations, outbound network calls — on hardware you operate, under a capability allowlist you define.
