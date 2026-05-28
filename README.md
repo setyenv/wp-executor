@@ -14,20 +14,9 @@ This repository contains the executor binary, install scripts for Linux, macOS a
 
 ## Where this fits
 
-```
-                                       results + logs
-        ┌─────────────────────────────┐  ◀───────────  ┌───────────────────┐
-        │   WP-PFWorkflow platform    │                │   wp-executor     │
-        │   (commercial WP product)   │  ──────────▶   │   (this binary)   │
-        └─────────────────────────────┘  job intent    └────────┬──────────┘
-                       ▲                                        │
-                       │ user-facing automations                │ runs in your
-                       │                                        │ environment
-                ┌──────┴──────┐                          ┌──────▼──────────┐
-                │ WordPress   │                          │ shell · files · │
-                │ admin       │                          │ HTTP · system   │
-                └─────────────┘                          └─────────────────┘
-```
+<p align="center">
+  <img src="assets/cross-plugin-architecture.svg" alt="Project Flash architecture: WP-PFAgent (LLM-driven console) constructs WP-PFManagement entities and WP-PFWorkflow workflows inside your WordPress install; WP-PFWorkflow publishes an HMAC-signed job queue that wp-executor polls from an external machine." width="900" />
+</p>
 
 The platform is where customers compose automations. When a step requires an action that should not run inside the WordPress request lifecycle — repository synchronisation, media transcoding, scheduled backups, or any operation that benefits from a separate execution boundary — the platform records the intent. `wp-executor` polls for that intent on its own cadence, evaluates it against a local capability allowlist, executes it, and returns a structured result. Authentication is bearer-token, optionally augmented with HMAC body signing.
 
@@ -154,11 +143,12 @@ A successful probe prints the upstream contract document and exits zero.
 
 | Component | Status |
 |---|---|
-| **wp-executor** (this repository) | **Open source.** Released under MIT OR Apache-2.0. |
-| **WP-PFWorkflow** | The commercial visual workflow platform shown in the screenshots above. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
-| **WP-PFAgent** | The commercial AI agent layer that drives the workflow platform from natural language. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
+| <img src="assets/logo-executor.png" alt="wp-executor logo" width="64" /><br/>**wp-executor** (this repository) | **Open source.** Released under MIT OR Apache-2.0. |
+| <img src="assets/logo-pfw.png" alt="WP-PFWorkflow logo" width="64" /><br/>**WP-PFWorkflow** | The commercial visual workflow platform shown in the screenshots above. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
+| <img src="assets/logo-pfa.png" alt="WP-PFAgent logo" width="64" /><br/>**WP-PFAgent** | The commercial AI agent layer that drives the workflow platform from natural language. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
+| <img src="assets/logo-pfm.png" alt="WP-PFManagement logo" width="64" /><br/>**WP-PFManagement** | The commercial structured-data layer (entities, fields, forms, lists, business rules) that the platform builds apps on top of. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
 
-WP-PFWorkflow and WP-PFAgent are **proprietary, per-customer-licensed WordPress plugins**, distributed independently of this repository's permissive licence. They will be available for evaluation, purchase and licensing through the Project Flash product portal at [project-flash.com](https://project-flash.com) when the launch window opens.
+WP-PFWorkflow, WP-PFAgent and WP-PFManagement are **proprietary, per-customer-licensed WordPress plugins**, distributed independently of this repository's permissive licence. They will be available for evaluation, purchase and licensing through the Project Flash product portal at [project-flash.com](https://project-flash.com) when the launch window opens.
 
 The executor is fully functional on its own against the platform's published REST contract; no commercial licence is required to operate `wp-executor` itself — only to license the platform on the WordPress side.
 
