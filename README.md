@@ -155,10 +155,10 @@ A successful probe prints the upstream contract document and exits zero.
 | Component | Status |
 |---|---|
 | **wp-executor** (this repository) | **Open source.** Released under MIT OR Apache-2.0. |
-| **WP-PFWorkflow** | The commercial visual workflow platform shown in the screenshots above. WordPress plugin, source-available to licensees. **General availability: May 14, 2026.** |
-| **WP-PFAgent** | The commercial AI agent layer that drives the workflow platform from natural language. WordPress plugin, source-available to licensees. **General availability: May 14, 2026.** |
+| **WP-PFWorkflow** | The commercial visual workflow platform shown in the screenshots above. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
+| **WP-PFAgent** | The commercial AI agent layer that drives the workflow platform from natural language. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
 
-WP-PFWorkflow and WP-PFAgent are **proprietary, source-available to licensees only**, and are distributed independently of this repository's permissive license. Both will be available for evaluation, purchase and licensing through the Project Flash product portal at [project-flash.com](https://project-flash.com), opening **May 7, 2026**.
+WP-PFWorkflow and WP-PFAgent are **proprietary, per-customer-licensed WordPress plugins**, distributed independently of this repository's permissive licence. They will be available for evaluation, purchase and licensing through the Project Flash product portal at [project-flash.com](https://project-flash.com) when the launch window opens.
 
 The executor is fully functional on its own against the platform's published REST contract; no commercial licence is required to operate `wp-executor` itself — only to license the platform on the WordPress side.
 
