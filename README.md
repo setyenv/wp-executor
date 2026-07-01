@@ -173,8 +173,8 @@ Dual-licensed under either of:
 
 at your option. SPDX: `MIT OR Apache-2.0`.
 
-The screenshots under `assets/` are © Project Flash Build and depict the commercial WP-PFWorkflow product. They are redistributed within this repository under the same dual licence as the source.
+The screenshots under `assets/` depict the commercial WP-PFWorkflow™ product and are redistributed within this repository under the same dual licence as the source.
 
 ---
 
-© 2026 Project Flash Build. Project Flash™, WP-PFWorkflow™, WP-PFManagement™ and WP-PFAgent™ are trademarks of Project Flash Build.
+Project Flash™, WP-PFWorkflow™, WP-PFManagement™ and WP-PFAgent™ are trademarks of Project Flash.
