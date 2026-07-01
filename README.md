@@ -1,10 +1,10 @@
-# WP Executor
+# WP-Executor
 
-> **The open-source remote execution agent for the ProjectFlash workflow platform.** A single-binary worker, written in Rust, that performs the host-side operations a workflow requires — system commands, file IO, outbound HTTP — on infrastructure you control.
+> **The open-source remote execution agent for the Project Flash™ workflow engine.** A single-binary worker, written in Rust, that runs a workflow's host-side operations — system commands, file IO, outbound HTTP — on *your own machine, in your own tools*, under a capability allowlist you define.
 
 [![license](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue.svg)](#license)
 
-`wp-executor` is the open-source companion of the ProjectFlash commercial workflow platform. The platform models the *intent* of an automation; this binary executes that intent's host-side actions — shell commands, file system operations, outbound network calls — on hardware you operate, under a capability allowlist you define.
+`wp-executor` is the open-source companion of the Project Flash workflow engine. The engine models the *intent* of an automation; this binary executes that intent's host-side actions — shell commands, file system operations, outbound network calls — on hardware you operate, under a capability allowlist you define.
 
 This repository contains the executor binary and install scripts for Linux, macOS and Windows.
 
@@ -137,18 +137,18 @@ A successful probe prints the upstream contract document and exits zero.
 
 ## Related products
 
-`wp-executor` is the open-source surface of a three-product portfolio from Project Flash Build:
+`wp-executor` is the open-source surface of the Project Flash™ suite from Project Flash Build. Two of the plugins are open source and free; two are proprietary and licensed:
 
 | Component | Status |
 |---|---|
-| <img src="assets/logo-executor.png" alt="wp-executor logo" width="64" /><br/>**wp-executor** (this repository) | **Open source.** Released under MIT OR Apache-2.0. |
-| <img src="assets/logo-pfw.png" alt="WP-PFWorkflow logo" width="64" /><br/>**WP-PFWorkflow** | The commercial visual workflow platform shown in the screenshots above. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
-| <img src="assets/logo-pfa.png" alt="WP-PFAgent logo" width="64" /><br/>**WP-PFAgent** | The commercial AI agent layer that drives the workflow platform from natural language. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
-| <img src="assets/logo-pfm.png" alt="WP-PFManagement logo" width="64" /><br/>**WP-PFManagement** | The commercial structured-data layer (entities, fields, forms, lists, business rules) that the platform builds apps on top of. Proprietary WordPress plugin, licensed per customer. **Launching in 2026.** |
+| <img src="assets/logo-executor.png" alt="WP-Executor logo" width="64" /><br/>**WP-Executor** (this repository) | **Open source**, MIT OR Apache-2.0. Free; no licence is required to run it. |
+| <img src="assets/logo-pfa.png" alt="WP-PFAgent logo" width="64" /><br/>**WP-PFAgent™** | The AI agent layer that turns natural language into workflows and entities. **Open source (GPL-2.0-or-later), free.** Needs a licensed WP-PFWorkflow or WP-PFManagement on the WordPress side to do useful work. |
+| <img src="assets/logo-pfw.png" alt="WP-PFWorkflow logo" width="64" /><br/>**WP-PFWorkflow™** | The visual workflow engine shown in the screenshots above. **Proprietary**, per-customer-licensed WordPress plugin (monthly or annual, per domain). |
+| <img src="assets/logo-pfm.png" alt="WP-PFManagement logo" width="64" /><br/>**WP-PFManagement™** | The **low-code platform** — model entities, fields, forms, lists, permissions and business rules to build real apps (ITSM, CRM, asset/CMDB, service desk) inside WordPress, no external SaaS. **Proprietary**, per-customer-licensed WordPress plugin. |
 
-WP-PFWorkflow, WP-PFAgent and WP-PFManagement are **proprietary, per-customer-licensed WordPress plugins**, distributed independently of this repository's permissive licence. They will be available for evaluation, purchase and licensing through the Project Flash product portal at [project-flash.com](https://project-flash.com) when the launch window opens.
+**WP-PFWorkflow** and **WP-PFManagement** are the proprietary, per-customer-licensed plugins: the default build ships obfuscated and is refundable, with an optional annual add-on that delivers the clean PHP source. **WP-PFAgent** and **WP-Executor** are open source and free. All are available for evaluation, purchase and licensing through the Project Flash product portal at [project-flash.com](https://project-flash.com).
 
-The executor is fully functional on its own against the platform's published REST contract; no commercial licence is required to operate `wp-executor` itself — only to license the platform on the WordPress side.
+The executor and WP-PFAgent are fully open source; no commercial licence is required to operate them — only the WordPress side, WP-PFWorkflow or WP-PFManagement, requires a licence.
 
 ---
 
@@ -177,4 +177,4 @@ The screenshots under `assets/` are © Project Flash Build and depict the commer
 
 ---
 
-© 2026 Project Flash Build. The ProjectFlash name and logo are trademarks of Project Flash Build.
+© 2026 Project Flash Build. Project Flash™, WP-PFWorkflow™, WP-PFManagement™ and WP-PFAgent™ are trademarks of Project Flash Build.
