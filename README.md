@@ -1,8 +1,11 @@
 # WP-Executor
 
-> **The open-source remote execution agent for the Project Flash™ workflow engine.** A single-binary worker, written in Rust, that runs a workflow's host-side operations — system commands, file IO, outbound HTTP — on *your own machine, in your own tools*, under a capability allowlist you define.
+> **wp-executor — run on your own machine.** The open-source runner for the Project Flash™ suite: a single-binary worker, written in Rust, that takes your workflow events and runs them on *your own machine, in your own tools* — system commands, file IO, outbound HTTP — under a capability allowlist you define.
 
 [![license](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue.svg)](#license)
+[![rust](https://img.shields.io/badge/rust-1.80%2B-orange.svg)](#build-from-source)
+[![platforms](https://img.shields.io/badge/platforms-linux%20%7C%20macos%20%7C%20windows-lightgrey.svg)](#install)
+[![Project Flash](https://img.shields.io/badge/suite-project--flash.com-6c5ce7.svg)](https://project-flash.com)
 
 `wp-executor` is the open-source companion of the Project Flash workflow engine. The engine models the *intent* of an automation; this binary executes that intent's host-side actions — shell commands, file system operations, outbound network calls — on hardware you operate, under a capability allowlist you define.
 
@@ -19,6 +22,8 @@ This repository contains the executor binary and install scripts for Linux, macO
 The platform is where customers compose automations. When a step requires an action that should not run inside the WordPress request lifecycle — repository synchronisation, media transcoding, scheduled backups, or any operation that benefits from a separate execution boundary — the platform records the intent. `wp-executor` polls for that intent on its own cadence, evaluates it against a local capability allowlist, executes it, and returns a structured result. Authentication is bearer-token, optionally augmented with HMAC body signing.
 
 The wire protocol and queue semantics are not enumerated here: the platform publishes its versioned contract over a public REST surface, and the executor consumes it on startup as the source of truth.
+
+A worked end-to-end example — a WooCommerce order becoming a ticket, a workflow, an AI triage and an executor-generated RMA file — is documented at [project-flash.com/use-case](https://project-flash.com/use-case).
 
 ### What it shows
 
@@ -142,7 +147,7 @@ A successful probe prints the upstream contract document and exits zero.
 | Component | Status |
 |---|---|
 | <img src="assets/logo-executor.png" alt="WP-Executor logo" width="64" /><br/>**WP-Executor** (this repository) | **Open source**, MIT OR Apache-2.0. Free; no licence is required to run it. |
-| <img src="assets/logo-pfa.png" alt="WP-PFAgent logo" width="64" /><br/>**WP-PFAgent™** | The AI agent layer that turns natural language into workflows and entities. **Open source (GPL-2.0-or-later), free.** Needs a licensed WP-PFWorkflow or WP-PFManagement on the WordPress side to do useful work. |
+| <img src="assets/logo-pfa.png" alt="WP-PFAgent logo" width="64" /><br/>**WP-PFAgent™** | The AI agent layer that turns natural language into workflows and entities. **Open source (GPL-2.0-or-later), free** — [github.com/Project-Flash-Build/wp-pfagent](https://github.com/Project-Flash-Build/wp-pfagent). Needs a licensed WP-PFWorkflow or WP-PFManagement on the WordPress side to do useful work. |
 | <img src="assets/logo-pfw.png" alt="WP-PFWorkflow logo" width="64" /><br/>**WP-PFWorkflow™** | The visual workflow engine shown in the screenshots above. **Proprietary**, per-customer-licensed WordPress plugin (monthly or annual, per domain). |
 | <img src="assets/logo-pfm.png" alt="WP-PFManagement logo" width="64" /><br/>**WP-PFManagement™** | The **low-code platform** — model entities, fields, forms, lists, permissions and business rules to build real apps (ITSM, CRM, asset/CMDB, service desk) inside WordPress, no external SaaS. **Proprietary**, per-customer-licensed WordPress plugin. |
 
