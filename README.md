@@ -1,13 +1,13 @@
 # WP-Executor
 
-> **wp-executor — run on your own machine.** The open-source runner for the Project Flash™ suite: a single-binary worker, written in Rust, that takes your workflow events and runs them on *your own machine, in your own tools* — system commands, file IO, outbound HTTP — under a capability allowlist you define.
+> **wp-executor — run on your own machine.** The open-source runner for the Setyenv™ suite: a single-binary worker, written in Rust, that takes your workflow events and runs them on *your own machine, in your own tools* — system commands, file IO, outbound HTTP — under a capability allowlist you define.
 
 [![license](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue.svg)](#license)
 [![rust](https://img.shields.io/badge/rust-1.80%2B-orange.svg)](#build-from-source)
 [![platforms](https://img.shields.io/badge/platforms-linux%20%7C%20macos%20%7C%20windows-lightgrey.svg)](#install)
-[![Project Flash](https://img.shields.io/badge/suite-project--flash.com-6c5ce7.svg)](https://project-flash.com)
+[![Setyenv](https://img.shields.io/badge/suite-setyenv.com-6c5ce7.svg)](https://setyenv.com)
 
-`wp-executor` is the open-source companion of the Project Flash workflow engine. The engine models the *intent* of an automation; this binary executes that intent's host-side actions — shell commands, file system operations, outbound network calls — on hardware you operate, under a capability allowlist you define.
+`wp-executor` is the open-source companion of the Setyenv workflow engine. The engine models the *intent* of an automation; this binary executes that intent's host-side actions — shell commands, file system operations, outbound network calls — on hardware you operate, under a capability allowlist you define.
 
 This repository contains the executor binary and install scripts for Linux, macOS and Windows.
 
@@ -16,14 +16,14 @@ This repository contains the executor binary and install scripts for Linux, macO
 ## Where this fits
 
 <p align="center">
-  <img src="assets/cross-plugin-architecture.svg" alt="Project Flash architecture: WP-PFAgent (LLM-driven console) constructs WP-PFManagement entities and WP-PFWorkflow workflows inside your WordPress install; WP-PFWorkflow publishes an HMAC-signed job queue that wp-executor polls from an external machine." width="900" />
+  <img src="assets/cross-plugin-architecture.svg" alt="Setyenv architecture: WP-PFAgent (LLM-driven console) constructs WP-PFManagement entities and WP-PFWorkflow workflows inside your WordPress install; WP-PFWorkflow publishes an HMAC-signed job queue that wp-executor polls from an external machine." width="900" />
 </p>
 
 The platform is where customers compose automations. When a step requires an action that should not run inside the WordPress request lifecycle — repository synchronisation, media transcoding, scheduled backups, or any operation that benefits from a separate execution boundary — the platform records the intent. `wp-executor` polls for that intent on its own cadence, evaluates it against a local capability allowlist, executes it, and returns a structured result. Authentication is bearer-token, optionally augmented with HMAC body signing.
 
 The wire protocol and queue semantics are not enumerated here: the platform publishes its versioned contract over a public REST surface, and the executor consumes it on startup as the source of truth.
 
-A worked end-to-end example — a WooCommerce order becoming a ticket, a workflow, an AI triage and an executor-generated RMA file — is documented at [project-flash.com/use-case](https://project-flash.com/use-case).
+A worked end-to-end example — a WooCommerce order becoming a ticket, a workflow, an AI triage and an executor-generated RMA file — is documented at [setyenv.com/use-case](https://setyenv.com/use-case).
 
 ### What it shows
 
@@ -142,7 +142,7 @@ A successful probe prints the upstream contract document and exits zero.
 
 ## Related products
 
-`wp-executor` is the open-source surface of the Project Flash™ suite from Project Flash Build. Two of the plugins are open source and free; two are proprietary and licensed:
+`wp-executor` is the open-source surface of the Setyenv™ suite from Setyenv Build. Two of the plugins are open source and free; two are proprietary and licensed:
 
 | Component | Status |
 |---|---|
@@ -151,7 +151,7 @@ A successful probe prints the upstream contract document and exits zero.
 | <img src="assets/logo-pfw.png" alt="WP-PFWorkflow logo" width="64" /><br/>**WP-PFWorkflow™** | The visual workflow engine shown in the screenshots above. **Proprietary**, per-customer-licensed WordPress plugin (monthly or annual, per domain). |
 | <img src="assets/logo-pfm.png" alt="WP-PFManagement logo" width="64" /><br/>**WP-PFManagement™** | The **low-code platform** — model entities, fields, forms, lists, permissions and business rules to build real apps (ITSM, CRM, asset/CMDB, service desk) inside WordPress, no external SaaS. **Proprietary**, per-customer-licensed WordPress plugin. |
 
-**WP-PFWorkflow** and **WP-PFManagement** are the proprietary, per-customer-licensed plugins: the default build ships obfuscated and is refundable, with an optional annual add-on that delivers the clean PHP source. **WP-PFAgent** and **WP-Executor** are open source and free. All are available for evaluation, purchase and licensing through the Project Flash product portal at [project-flash.com](https://project-flash.com).
+**WP-PFWorkflow** and **WP-PFManagement** are the proprietary, per-customer-licensed plugins: the default build ships obfuscated and is refundable, with an optional annual add-on that delivers the clean PHP source. **WP-PFAgent** and **WP-Executor** are open source and free. All are available for evaluation, purchase and licensing through the Setyenv product portal at [setyenv.com](https://setyenv.com).
 
 The executor and WP-PFAgent are fully open source; no commercial licence is required to operate them — only the WordPress side, WP-PFWorkflow or WP-PFManagement, requires a licence.
 
@@ -182,4 +182,4 @@ The screenshots under `assets/` depict the commercial WP-PFWorkflow™ product a
 
 ---
 
-Project Flash™, WP-PFWorkflow™, WP-PFManagement™ and WP-PFAgent™ are trademarks of Project Flash.
+Setyenv™, WP-PFWorkflow™, WP-PFManagement™ and WP-PFAgent™ are trademarks of Setyenv.

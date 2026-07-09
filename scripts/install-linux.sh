@@ -68,7 +68,7 @@ fi
 
 cat > "${UNIT_PATH}" <<UNIT
 [Unit]
-Description=ProjectFlash Workflow remote executor
+Description=Setyenv Workflow remote executor
 Documentation=https://github.com/Project-Flash-Build/wp-executor
 After=network-online.target
 Wants=network-online.target
