@@ -17,7 +17,7 @@
   Service name used by sc.exe. Defaults to "wp-executor".
 
 .PARAMETER DisplayName
-  Display name shown in services.msc. Defaults to "ProjectFlash Workflow Executor".
+  Display name shown in services.msc. Defaults to "Setyenv Workflow Executor".
 
 .EXAMPLE
   .\install-windows.ps1
@@ -28,7 +28,7 @@ param(
     [string]$BinaryPath,
     [string]$ConfigPath = (Join-Path $env:ProgramData "wp-executor\config.toml"),
     [string]$ServiceName = "wp-executor",
-    [string]$DisplayName = "ProjectFlash Workflow Executor"
+    [string]$DisplayName = "Setyenv Workflow Executor"
 )
 
 $ErrorActionPreference = "Stop"
@@ -103,7 +103,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "sc.exe create failed: $createOutput"
 }
 
-& sc.exe description $ServiceName "ProjectFlash Workflow remote executor. Pulls jobs from a wp-pfworkflow site over the documented REST contract and runs them locally." | Out-Null
+& sc.exe description $ServiceName "Setyenv Workflow remote executor. Pulls jobs from a wp-pfworkflow site over the documented REST contract and runs them locally." | Out-Null
 
 # Configure recovery: restart on failure with 5s/30s/60s backoff.
 & sc.exe failure $ServiceName reset= 86400 actions= restart/5000/restart/30000/restart/60000 | Out-Null

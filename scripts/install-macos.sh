@@ -16,7 +16,7 @@ if [[ "${1:-}" == "--system" ]]; then
   MODE="system"
 fi
 
-LABEL="com.projectflash.wp-executor"
+LABEL="com.setyenv.wp-executor"
 
 if [[ -z "${WP_EXECUTOR_BIN:-}" ]]; then
   if command -v wp-executor >/dev/null 2>&1; then

@@ -8,7 +8,7 @@ if [[ "${1:-}" == "--system" ]]; then
   MODE="system"
 fi
 
-LABEL="com.projectflash.wp-executor"
+LABEL="com.setyenv.wp-executor"
 
 if [[ "${MODE}" == "user" ]]; then
   PLIST_DIR="${HOME}/Library/LaunchAgents"

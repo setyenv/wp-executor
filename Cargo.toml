@@ -6,7 +6,7 @@ rust-version = "1.80"
 authors = ["Setyenv Build <build@setyenv.com>"]
 description = "Open-source remote execution agent for the WP-PFWorkflow platform. Consumes the platform's published REST contract, runs the host-side actions a workflow requires, and returns structured results."
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/Project-Flash-Build/wp-executor"
+repository = "https://github.com/setyenv/wp-executor"
 keywords = ["wordpress", "automation", "executor", "queue", "cli"]
 categories = ["command-line-utilities"]
 
