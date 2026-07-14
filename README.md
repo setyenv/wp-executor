@@ -182,4 +182,4 @@ The screenshots under `assets/` depict the commercial WP-PFWorkflow™ product a
 
 ---
 
-Setyenv™, WP-PFWorkflow™, WP-PFManagement™ and WP-PFAgent™ are trademarks of Setyenv.
+Setyenv™, WP-PFWorkflow™, WP-PFManagement™ and WP-PFAgent™ are trademarks of Setyenv™.
