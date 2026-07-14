@@ -49,5 +49,15 @@ sign_requests = true
 # capability set when claiming, so this is mostly a defence-in-depth toggle.
 # allowed_capabilities = ["shell.run", "fs.read", "fs.write", "fs.list", "http.request", "system.info"]
 
+# Outbound egress allowlist for network-making capabilities (http.request).
+# The SSRF guard is ON by default: requests to private, loopback, link-local
+# (including the cloud metadata endpoint 169.254.169.254) or otherwise
+# non-global addresses are REJECTED — the host is resolved and every IP is
+# checked, and the connection is pinned to the validated address (no DNS
+# rebinding), with redirects not auto-followed. List hosts (or patterns like
+# "*.example.com") here to EXEMPT specific internal destinations you trust.
+# A single entry "*" disables the guard entirely.
+# allowed_egress_hosts = ["api.internal.example", "*.trusted.example"]
+
 # Optional User-Agent override. Default identifies the executor + version + OS.
 # user_agent = "my-host wp-executor/0.1"

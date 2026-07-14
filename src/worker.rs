@@ -135,7 +135,7 @@ async fn process_one(cfg: Arc<Config>, client: UpstreamClient, job: Job) {
 
     let result = match tokio::time::timeout(
         Duration::from_secs(timeout_secs),
-        caps::dispatch(&capability, job.payload.clone()),
+        caps::dispatch(&capability, job.payload.clone(), cfg.egress_allowlist()),
     )
     .await
     {
@@ -176,6 +176,7 @@ mod tests {
             allowed_capabilities: Some(vec!["fs.read".into()]),
             sign_requests: false,
             user_agent: None,
+            allowed_egress_hosts: None,
         })
     }
 

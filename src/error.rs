@@ -36,6 +36,9 @@ pub enum ExecutorError {
     PathForbidden(String),
 
     #[error("{0}")]
+    EgressBlocked(String),
+
+    #[error("{0}")]
     Other(String),
 }
 

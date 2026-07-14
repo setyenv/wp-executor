@@ -32,7 +32,7 @@ pub const SUPPORTED_CAPABILITIES: &[&str] = &[
 /// Dispatch a job to the appropriate handler. Wraps the result with timing
 /// and translates any handler error into a typed `JobResult` so the worker
 /// can always report something coherent to the upstream.
-pub async fn dispatch(capability: &str, payload: Value) -> JobResult {
+pub async fn dispatch(capability: &str, payload: Value, egress_allowlist: &[String]) -> JobResult {
     let started = Instant::now();
     info!(target: "wp_executor::caps", capability = capability, "dispatching");
     let outcome = match capability {
@@ -40,7 +40,7 @@ pub async fn dispatch(capability: &str, payload: Value) -> JobResult {
         "fs.read" => fs_read::run(payload).await,
         "fs.write" => fs_write::run(payload).await,
         "fs.list" => fs_list::run(payload).await,
-        "http.request" => http_request::run(payload).await,
+        "http.request" => http_request::run(payload, egress_allowlist).await,
         "system.info" => system_info::run(payload).await,
         other => Err(ExecutorError::UnsupportedCapability(other.into())),
     };
@@ -105,7 +105,7 @@ mod tests {
 
     #[tokio::test]
     async fn dispatch_unknown_capability_returns_error_result() {
-        let r = dispatch("nope.does_not_exist", json!({})).await;
+        let r = dispatch("nope.does_not_exist", json!({}), &[]).await;
         assert_eq!(r.exit_code, Some(1));
         assert!(r.error.contains("nope.does_not_exist"));
     }

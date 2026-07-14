@@ -33,6 +33,7 @@ fn cfg(base_url: String) -> Arc<Config> {
         allowed_capabilities: None,
         sign_requests: true,
         user_agent: Some("wp-executor-test/0.1".into()),
+        allowed_egress_hosts: None,
     })
 }
 

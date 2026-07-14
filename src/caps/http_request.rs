@@ -1,5 +1,6 @@
 use crate::caps::{optional_string, optional_u64, require_string};
 use crate::error::{ExecutorError, Result};
+use crate::net_guard::EgressGuard;
 use crate::types::JobResult;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, CONTENT_TYPE};
 use reqwest::Method;
@@ -7,7 +8,7 @@ use serde_json::{json, Value};
 use std::str::FromStr;
 use std::time::{Duration, Instant};
 
-pub async fn run(payload: Value) -> Result<JobResult> {
+pub async fn run(payload: Value, egress_allowlist: &[String]) -> Result<JobResult> {
     let url = require_string(&payload, "url")?;
     let method = optional_string(&payload, "method", "GET").to_uppercase();
     let timeout_secs = optional_u64(&payload, "timeout_seconds", 30);
@@ -18,11 +19,40 @@ pub async fn run(payload: Value) -> Result<JobResult> {
     let headers = build_headers(payload.get("headers"))?;
     let body = payload.get("body");
 
-    let client = reqwest::Client::builder()
+    // Parse the URL up front so the egress guard can inspect the host.
+    let parsed = reqwest::Url::parse(&url)
+        .map_err(|e| ExecutorError::InvalidPayload(format!("invalid url '{}': {}", url, e)))?;
+
+    let mut builder = reqwest::Client::builder()
         .timeout(Duration::from_secs(timeout_secs))
-        .gzip(true)
-        .build()?;
-    let mut req = client.request(method, &url).headers(headers.clone());
+        .gzip(true);
+
+    // Outbound egress guard (SSRF protection): on by default, relaxable via the
+    // operator's allowed_egress_hosts allowlist ("*" disables it).
+    let guard = EgressGuard::new(egress_allowlist);
+    if guard.enforcing() {
+        let host = parsed
+            .host_str()
+            .ok_or_else(|| ExecutorError::InvalidPayload(format!("url has no host: {}", url)))?;
+        let port = parsed.port_or_known_default().ok_or_else(|| {
+            ExecutorError::InvalidPayload(format!("url has no usable scheme/port: {}", url))
+        })?;
+        match guard.resolve_checked(host, port).await {
+            Ok(None) => {} // allowlisted host: connect normally
+            Ok(Some(addrs)) => {
+                // Pin the connection to the validated address(es) so a second
+                // DNS lookup cannot rebind the name to an internal target.
+                builder = builder.resolve_to_addrs(host, &addrs);
+            }
+            Err(msg) => return Err(ExecutorError::EgressBlocked(msg)),
+        }
+        // Never auto-follow redirects while guarding: a 3xx to an internal host
+        // would otherwise bypass the check. The 3xx is returned to the caller.
+        builder = builder.redirect(reqwest::redirect::Policy::none());
+    }
+
+    let client = builder.build()?;
+    let mut req = client.request(method, parsed).headers(headers.clone());
 
     if let Some(body) = body {
         if let Some(s) = body.as_str() {
@@ -113,6 +143,16 @@ mod tests {
     use wiremock::matchers::{header, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
+    /// Allowlist that exempts the local MockServer (loopback) from the egress
+    /// guard — the relaxation an operator would configure for a trusted host.
+    fn allow_local() -> Vec<String> {
+        vec![
+            "127.0.0.1".to_string(),
+            "::1".to_string(),
+            "localhost".to_string(),
+        ]
+    }
+
     #[tokio::test]
     async fn successful_get_returns_exit_zero_and_body() {
         let server = MockServer::start().await;
@@ -127,7 +167,7 @@ mod tests {
             .await;
 
         let url = format!("{}/ping", server.uri());
-        let r = run(json!({ "url": url })).await.unwrap();
+        let r = run(json!({ "url": url }), &allow_local()).await.unwrap();
         assert_eq!(r.exit_code, Some(0));
         let out = r.output.unwrap();
         assert_eq!(out["status_code"], 200);
@@ -143,7 +183,7 @@ mod tests {
             .mount(&server)
             .await;
         let url = format!("{}/notfound", server.uri());
-        let r = run(json!({ "url": url })).await.unwrap();
+        let r = run(json!({ "url": url }), &allow_local()).await.unwrap();
         assert_eq!(r.exit_code, Some(404));
     }
 
@@ -157,11 +197,14 @@ mod tests {
             .mount(&server)
             .await;
         let url = format!("{}/echo", server.uri());
-        let r = run(json!({
-            "url": url,
-            "method": "POST",
-            "body": { "name": "alice" },
-        }))
+        let r = run(
+            json!({
+                "url": url,
+                "method": "POST",
+                "body": { "name": "alice" },
+            }),
+            &allow_local(),
+        )
         .await
         .unwrap();
         assert_eq!(r.exit_code, Some(0));
@@ -173,13 +216,13 @@ mod tests {
         // HTTP allows custom method tokens (any token chars) so "NOPE" parses.
         // To force a parse error use a method string with invalid token chars
         // such as a space.
-        let r = run(json!({ "url": "http://x", "method": "GET BAD" })).await;
+        let r = run(json!({ "url": "http://x", "method": "GET BAD" }), &[]).await;
         assert!(matches!(r, Err(ExecutorError::InvalidPayload(_))));
     }
 
     #[tokio::test]
     async fn missing_url_errors() {
-        let r = run(json!({})).await;
+        let r = run(json!({}), &[]).await;
         assert!(matches!(r, Err(ExecutorError::InvalidPayload(_))));
     }
 
@@ -193,12 +236,59 @@ mod tests {
             .mount(&server)
             .await;
         let url = format!("{}/auth", server.uri());
-        let r = run(json!({
-            "url": url,
-            "headers": { "Authorization": "Bearer abc" },
-        }))
+        let r = run(
+            json!({
+                "url": url,
+                "headers": { "Authorization": "Bearer abc" },
+            }),
+            &allow_local(),
+        )
         .await
         .unwrap();
+        assert_eq!(r.exit_code, Some(0));
+    }
+
+    // --- egress guard (SSRF) ---
+
+    #[tokio::test]
+    async fn blocks_cloud_metadata_by_default() {
+        // 169.254.169.254 is the canonical cloud metadata endpoint. With no
+        // allowlist the guard must reject it before any connection is made.
+        let r = run(
+            json!({ "url": "http://169.254.169.254/latest/meta-data/" }),
+            &[],
+        )
+        .await;
+        assert!(matches!(r, Err(ExecutorError::EgressBlocked(_))));
+    }
+
+    #[tokio::test]
+    async fn blocks_private_rfc1918_by_default() {
+        let r = run(json!({ "url": "http://10.0.0.1/" }), &[]).await;
+        assert!(matches!(r, Err(ExecutorError::EgressBlocked(_))));
+        let r = run(json!({ "url": "http://192.168.1.1/admin" }), &[]).await;
+        assert!(matches!(r, Err(ExecutorError::EgressBlocked(_))));
+    }
+
+    #[tokio::test]
+    async fn blocks_loopback_name_by_default() {
+        // Resolves locally to a loopback address; must be blocked.
+        let r = run(json!({ "url": "http://localhost:9/" }), &[]).await;
+        assert!(matches!(r, Err(ExecutorError::EgressBlocked(_))));
+    }
+
+    #[tokio::test]
+    async fn allowlisted_host_reaches_server() {
+        // A host on the allowlist is reachable even though it is loopback —
+        // this is the operator-controlled relaxation.
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/ok"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("ok"))
+            .mount(&server)
+            .await;
+        let url = format!("{}/ok", server.uri());
+        let r = run(json!({ "url": url }), &allow_local()).await.unwrap();
         assert_eq!(r.exit_code, Some(0));
     }
 }

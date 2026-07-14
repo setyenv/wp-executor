@@ -144,6 +144,7 @@ fn build_config(cli: &Cli) -> Result<Config> {
             allowed_capabilities: None,
             sign_requests: true,
             user_agent: None,
+            allowed_egress_hosts: None,
         }
     };
 

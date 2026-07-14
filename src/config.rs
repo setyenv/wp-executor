@@ -61,6 +61,17 @@ pub struct Config {
     #[serde(default = "default_true")]
     pub sign_requests: bool,
 
+    /// Outbound egress allowlist for capabilities that make network requests
+    /// (currently `http.request`). The SSRF guard is ON by default: requests
+    /// to private, loopback, link-local (incl. the cloud metadata endpoint
+    /// 169.254.169.254) or otherwise non-global addresses are rejected. Hosts
+    /// (or patterns like `*.example.com`) listed here are exempted from that
+    /// block, so specific internal destinations you trust remain reachable. A
+    /// single entry `"*"` disables the guard entirely. When `None`/empty the
+    /// guard blocks all private/internal destinations and allows public ones.
+    #[serde(default)]
+    pub allowed_egress_hosts: Option<Vec<String>>,
+
     /// Override the user-agent string. Default identifies the executor +
     /// version + OS so server logs can audit the agent population.
     #[serde(default)]
@@ -121,6 +132,13 @@ impl Config {
             None => true,
             Some(list) => list.iter().any(|c| c == key),
         }
+    }
+
+    /// The outbound egress allowlist as a slice (empty when unset — the SSRF
+    /// guard then blocks all private/internal destinations and allows public
+    /// ones).
+    pub fn egress_allowlist(&self) -> &[String] {
+        self.allowed_egress_hosts.as_deref().unwrap_or(&[])
     }
 
     pub fn validate(&self) -> Result<()> {
@@ -184,6 +202,7 @@ mod tests {
             allowed_capabilities: None,
             sign_requests: true,
             user_agent: None,
+            allowed_egress_hosts: None,
         }
     }
 

@@ -7,5 +7,6 @@ pub mod cli;
 pub mod client;
 pub mod config;
 pub mod error;
+pub mod net_guard;
 pub mod types;
 pub mod worker;

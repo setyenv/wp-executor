@@ -28,11 +28,20 @@ powerful by design, so the security model is about **bounding that power**.
   (`reqwest` built with `default-features = false, features = ["rustls-tls"]`) —
   there is no OpenSSL / native-TLS in the dependency tree. Use an `https://`
   `base_url` in production.
-- **Capability allowlist.** Two layers gate which actions may run: the upstream
-  issues a per-worker capability set, and the worker enforces its own optional
-  local `allowed_capabilities` allowlist (jobs for a capability outside it are
-  rejected with `pfw_capability_not_allowed`). Set it to the minimum your
-  workflows need.
+- **Two-layer allowlist — what it may do, and where it may reach.**
+  - *Capabilities:* the upstream issues a per-worker capability set, and the
+    worker enforces its own optional local `allowed_capabilities` allowlist
+    (jobs for a capability outside it are rejected with
+    `pfw_capability_not_allowed`). Set it to the minimum your workflows need.
+  - *Egress (SSRF guard, on by default):* the `http.request` capability rejects
+    connections to non-global destinations — RFC-1918 private ranges, loopback,
+    link-local (including the cloud metadata endpoint `169.254.169.254`), IPv6
+    unique-local / link-local, and IPv4-mapped forms of those. The host is
+    resolved and *every* resulting IP is checked (not just the URL string), the
+    connection is pinned to the validated address so DNS rebinding can't slip
+    through, and redirects are not auto-followed. Relax it for specific trusted
+    hosts via `allowed_egress_hosts` (patterns like `*.example.com` are
+    supported; a single `"*"` disables the guard). Keep the allowlist narrow.
 - **Low-privilege by default.** The Linux installer creates a dedicated system
   user (`useradd --system --no-create-home --shell /usr/sbin/nologin`) and runs
   under systemd hardening: `User=wp-executor`, `NoNewPrivileges=yes`,
@@ -44,14 +53,14 @@ powerful by design, so the security model is about **bounding that power**.
 ## Operator responsibilities
 
 The worker executes what your trusted site dispatches, as the OS user it runs
-as. Its blast radius is bounded by that user's privileges, the capability
-allowlist, and the OS sandbox — **not** by application-level content filtering:
+as. Its blast radius is bounded by that user's privileges, the two-layer
+allowlist above, and the OS sandbox:
 
-- **No built-in network egress allowlist.** The `http_request` capability will
-  connect to whatever URL a job specifies; the worker does not restrict
-  destination hosts. If you need to limit outbound reach — for example to block
-  SSRF-style access to internal services — enforce it at the **firewall/network
-  layer**, and/or disable `http_request` via `allowed_capabilities`.
+- **Tune the egress allowlist.** The SSRF guard blocks internal destinations by
+  default. If a workflow legitimately needs a specific internal host, add just
+  that host to `allowed_egress_hosts` — do not disable the guard with `"*"`
+  unless the worker runs on an already-isolated network. For defence in depth
+  you can also restrict outbound reach at the firewall/network layer.
 - **Filesystem and shell reach follow the OS user.** `fs.write` and `shell.run`
   run with the service user's permissions. Keep that user unprivileged and rely
   on the systemd hardening above (or an equivalent container/sandbox) to

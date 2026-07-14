@@ -1,6 +1,6 @@
 [package]
 name = "wp-executor"
-version = "1.0.3"
+version = "1.0.4"
 edition = "2021"
 rust-version = "1.80"
 authors = ["Setyenv Build <build@setyenv.com>"]
@@ -19,7 +19,7 @@ name = "wp_executor"
 path = "src/lib.rs"
 
 [dependencies]
-tokio = { version = "1.40", features = ["rt-multi-thread", "macros", "process", "fs", "signal", "time", "io-util", "sync"] }
+tokio = { version = "1.40", features = ["rt-multi-thread", "macros", "process", "fs", "signal", "time", "io-util", "sync", "net"] }
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "gzip"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
