@@ -56,7 +56,7 @@ Every capability accepts an executor-side timeout, refuses to perform operations
 
 ### Pre-built binaries
 
-Each tagged release publishes binaries for Linux (x86_64), macOS (x86_64 + Apple Silicon) and Windows (x86_64). Download the archive that matches your platform from the [releases page](https://github.com/Project-Flash-Build/wp-executor/releases), unzip, and place the `wp-executor` binary somewhere on your `PATH`.
+Each tagged release publishes binaries for Linux (x86_64), macOS (x86_64 + Apple Silicon) and Windows (x86_64). Download the archive that matches your platform from the [releases page](https://github.com/setyenv/wp-executor/releases), unzip, and place the `wp-executor` binary somewhere on your `PATH`.
 
 ### Build from source
 
@@ -147,7 +147,7 @@ A successful probe prints the upstream contract document and exits zero.
 | Component | Status |
 |---|---|
 | <img src="assets/logo-executor.png" alt="WP-Executor logo" width="64" /><br/>**WP-Executor** (this repository) | **Open source**, MIT OR Apache-2.0. Free; no licence is required to run it. |
-| <img src="assets/logo-pfa.png" alt="WP-PFAgent logo" width="64" /><br/>**WP-PFAgent™** | The AI agent layer that turns natural language into workflows and entities. **Open source (GPL-2.0-or-later), free** — [github.com/Project-Flash-Build/wp-pfagent](https://github.com/Project-Flash-Build/wp-pfagent). Needs a licensed WP-PFWorkflow or WP-PFManagement on the WordPress side to do useful work. |
+| <img src="assets/logo-pfa.png" alt="WP-PFAgent logo" width="64" /><br/>**WP-PFAgent™** | The AI agent layer that turns natural language into workflows and entities. **Open source (GPL-2.0-or-later), free** — [github.com/setyenv/wp-pfagent](https://github.com/setyenv/wp-pfagent). Needs a licensed WP-PFWorkflow or WP-PFManagement on the WordPress side to do useful work. |
 | <img src="assets/logo-pfw.png" alt="WP-PFWorkflow logo" width="64" /><br/>**WP-PFWorkflow™** | The visual workflow engine shown in the screenshots above. **Proprietary**, per-customer-licensed WordPress plugin (monthly or annual, per domain). |
 | <img src="assets/logo-pfm.png" alt="WP-PFManagement logo" width="64" /><br/>**WP-PFManagement™** | The **low-code platform** — model entities, fields, forms, lists, permissions and business rules to build real apps (ITSM, CRM, asset/CMDB, service desk) inside WordPress, no external SaaS. **Proprietary**, per-customer-licensed WordPress plugin. |
 
